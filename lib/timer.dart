@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vibrate/vibrate.dart';
+import 'dart:async';
 
 class TimerUI extends StatefulWidget {
   @override
@@ -7,12 +8,48 @@ class TimerUI extends StatefulWidget {
 }
 
 class _TimerUIState extends State<TimerUI> {
-  int _left;
+  static const int _workPeriod = 10; //* 60;
+  Stopwatch _stopwatch;
+  String _timerText;
 
   @override
   void initState() {
     super.initState();
-    _left = 25 * 60;
+    _stopwatch = Stopwatch();
+    _timerText = "";
+    Timer.periodic(Duration(seconds: 1), (Timer t) => _draw());
+  }
+
+  void _startAlarm() {
+    _stopwatch.start();
+  }
+
+  void _stopAlarm() {
+    _stopwatch.stop();
+  }
+
+  void _resetAlarm() {
+    _stopwatch.stop();
+    _stopwatch.reset();
+  }
+
+  void _draw() {
+    int left = _workPeriod - _stopwatch.elapsed.inSeconds;
+    print("draw");
+
+    if (left <= 0) {
+      _resetAlarm();
+      _vibrate();
+    }
+
+    setState(() {
+      _timerText =
+          "${(left / 60).floor()}:${(left % 60).toString().padLeft(2, '0')}";
+    });
+  }
+
+  void _vibrate() {
+    Vibrate.feedback(FeedbackType.heavy);
   }
 
   @override
@@ -22,7 +59,7 @@ class _TimerUIState extends State<TimerUI> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            "${(_left / 60).floor()}:${(_left % 60).toString().padLeft(2, '0')}",
+            _timerText,
             style: Theme.of(context).textTheme.display3,
           ),
           SizedBox(
@@ -30,11 +67,7 @@ class _TimerUIState extends State<TimerUI> {
           ),
           OutlineButton(
             onPressed: () {
-              Vibrate.feedback(FeedbackType.medium);
-
-              setState(() {
-                _left -= 1;
-              });
+              _startAlarm();
             },
             child: const Text('Start', style: TextStyle(fontSize: 20)),
           ),

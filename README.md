@@ -3,5 +3,7 @@
 A plain simple pomodoro App.
 ![screenshot](screenshot.png)
 
-It doesn't yet work, but it will soon.
+So, it does work somewhat, if the App is open, you don't switch to another 
+App and your phone doesn't enter standby.
+To sum up, its very much a work in progress.
 
